@@ -9,13 +9,20 @@ export default function Home() {
   return (
     <>
       <BannerCarousel />
+
       <div className="container mt-4">
         <h2 className="mb-4">Products</h2>
 
         {loading && <p>Loading products...</p>}
 
+        {!loading && products.length === 0 && (
+          <p>No products found. Select a category or search.</p>
+        )}
+
         <div className="row">
-          {products.map(p => <ProductCard key={p.id} product={p} />)}
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
         </div>
       </div>
     </>

@@ -1,33 +1,39 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css"
+import "../styles/Navbar.css";
 import { useCart } from "../context/CartContext";
 import { useProducts } from "../context/ProductContext";
 import { useUser } from "../context/UserContext";
 
 export default function Navbar() {
   const { totalItems } = useCart();
-  const { categories, setSearchTerm, setCategory, searchTerm } = useProducts();
+  const { categories, setSearchTerm, setCategory, searchTerm, category } = useProducts();
   const { user, logout } = useUser();
+
   const [localSearch, setLocalSearch] = useState(searchTerm || "");
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setCategory(""); // reset category when searching
     setSearchTerm(localSearch);
     navigate("/");
   };
 
   const handleCategory = (cat) => {
-    setCategory(cat);
+    setSearchTerm("");      // clear search input
+    setLocalSearch("");
+    setCategory(cat);       // set chosen category
+    document.body.click();  // close dropdown instantly
     navigate("/");
   };
+
+  // Show "All" if category is empty
+  const selectedCategory = category || "All";
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
       <div className="container-fluid">
-
-        {/* Brand acts as Home */}
         <Link className="navbar-brand" to="/">Skyler</Link>
 
         <button
@@ -42,19 +48,21 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navCollapse">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
 
-            {/* Category dropdown */}
+            {/* CATEGORY DROPDOWN */}
             <li className="nav-item dropdown">
               <button
                 className="btn nav-link dropdown-toggle bg-transparent border-0"
-                id="catDrop"
                 data-bs-toggle="dropdown"
               >
-                Categories
+                {selectedCategory}
               </button>
 
-              <ul className="dropdown-menu" aria-labelledby="catDrop">
+              <ul className="dropdown-menu">
                 <li>
-                  <button className="dropdown-item" onClick={() => handleCategory("")}>
+                  <button
+                    className={`dropdown-item ${category === "" ? "active" : ""}`}
+                    onClick={() => handleCategory("")}
+                  >
                     All
                   </button>
                 </li>
@@ -62,7 +70,7 @@ export default function Navbar() {
                 {categories.map((cat) => (
                   <li key={cat}>
                     <button
-                      className="dropdown-item"
+                      className={`dropdown-item ${category === cat ? "active" : ""}`}
                       onClick={() => handleCategory(cat)}
                     >
                       {cat}
@@ -72,25 +80,22 @@ export default function Navbar() {
               </ul>
             </li>
 
-            {/* Login button */}
             {!user && (
               <li className="nav-item">
                 <Link className="nav-link" to="/login">Login</Link>
               </li>
             )}
 
-            {/* User dropdown when logged in */}
             {user && (
               <li className="nav-item dropdown">
                 <button
                   className="btn nav-link dropdown-toggle bg-transparent border-0"
-                  id="userDrop"
                   data-bs-toggle="dropdown"
                 >
                   {user.name}
                 </button>
 
-                <ul className="dropdown-menu" aria-labelledby="userDrop">
+                <ul className="dropdown-menu">
                   <li>
                     <button
                       className="dropdown-item"
@@ -107,27 +112,24 @@ export default function Navbar() {
             )}
           </ul>
 
-          {/* Search bar */}
+          {/* SEARCH */}
           <form className="d-flex me-3" onSubmit={handleSearch}>
             <input
               className="form-control me-2"
               type="search"
               placeholder="Search products..."
-              aria-label="Search"
               value={localSearch}
               onChange={(e) => setLocalSearch(e.target.value)}
             />
-            <button className="btn btn-outline-warning bg-warn" type="submit">
+            <button className="btn btn-outline-warning" type="submit">
               Search
             </button>
           </form>
 
-          {/* Cart */}
-          <div className="d-flex">
-            <Link to="/cart" className="btn btn-outline-light">
-              Cart ({totalItems})
-            </Link>
-          </div>
+          {/* CART */}
+          <Link to="/cart" className="btn btn-outline-light">
+            Cart ({totalItems})
+          </Link>
         </div>
       </div>
     </nav>
