@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { ProductProvider } from "./context/ProductContext";
 import { CartProvider } from "./context/CartContext";
 import { UserProvider } from "./context/UserContext";
@@ -18,7 +18,8 @@ function App() {
     <ProductProvider>
       <CartProvider>
         <UserProvider>
-          <BrowserRouter>
+          {/* FIX: Use HashRouter instead of BrowserRouter */}
+          <HashRouter>
             <Navbar />
             <Routes>
               <Route path="/" element={<Home />} />
@@ -28,7 +29,7 @@ function App() {
               <Route path="/login" element={<Login />} />
             </Routes>
             <Footer />
-          </BrowserRouter>
+          </HashRouter>
         </UserProvider>
       </CartProvider>
     </ProductProvider>
